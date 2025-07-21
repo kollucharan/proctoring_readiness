@@ -25,9 +25,9 @@ export const Home: React.FC<HomeProps> = ({ formdata, setFormdata }) => {
       </main>
 
      
-        <div className="container">
+       
           <Footer />
-        </div>
+        
       
     </div>
   );
