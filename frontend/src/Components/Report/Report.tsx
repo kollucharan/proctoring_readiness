@@ -72,8 +72,9 @@ export const Report: React.FC<ReportProps> = ({ formdata }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-   <div className="flex justify-end mb-4 sm:mb-6">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+  
+   <div className="flex flex-col sm:flex-row justify-end  space-y-2 sm:space-y-0 sm:space-x-4">
   <button
     onClick={DownloadReport}
     disabled={isGenerating}
@@ -114,7 +115,7 @@ export const Report: React.FC<ReportProps> = ({ formdata }) => {
       </div>
     )}
     
-    {/* Download Icon */}
+   
     {!isGenerating && (
       <svg 
         className="w-4 h-4 sm:w-5 sm:h-5 mr-2 transition-transform duration-300 group-hover:translate-y-0.5" 
@@ -131,7 +132,7 @@ export const Report: React.FC<ReportProps> = ({ formdata }) => {
       </svg>
     )}
     
-    {/* Button Text */}
+    
     <span className="hidden sm:inline">
       {isGenerating ? 'Generating PDF...' : 'Download Report'}
     </span>
@@ -139,12 +140,47 @@ export const Report: React.FC<ReportProps> = ({ formdata }) => {
       {isGenerating ? 'Generating...' : 'Download Report'}
     </span>
     
-    {/* Subtle shine effect - only when not generating */}
+  
     {!isGenerating && (
       <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-10 transition-opacity duration-300 transform -skew-x-12" />
     )}
   </button>
+
+ <button 
+    className="group relative inline-flex items-center justify-center px-4 sm:px-6 py-2.5 sm:py-3
+               bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 cursor-pointer
+               text-white font-semibold text-sm sm:text-base
+               rounded-lg shadow-lg hover:shadow-xl
+               transition-all duration-300 ease-in-out
+               transform hover:scale-105 active:scale-95
+               focus:outline-none focus:ring-4 focus:ring-blue-300 focus:ring-opacity-50
+               border border-blue-600 hover:border-blue-700
+               w-full sm:w-auto"
+               onClick={()=>{
+                navigate('/');
+               }}
+  >
+    <svg 
+      className="w-4 h-4 sm:w-5 sm:h-5 mr-2 transition-transform duration-300 group-hover:rotate-45"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path 
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+      />
+    </svg>
+    
+    <span className="hidden sm:inline">Try Again</span>
+    <span className="sm:hidden">Try Again</span>
+    
+    <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-10 transition-opacity duration-300 transform -skew-x-12" />
+  </button>
 </div>
+
   </div>
       
       <div ref={reportRef} className="max-w-6xl mx-auto bg-white rounded-lg shadow-md px-4 sm:px-6 lg:px-8 py-8 sm:py-10 my-6" >
