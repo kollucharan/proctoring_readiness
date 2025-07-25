@@ -119,7 +119,7 @@ export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
     }
 
     
-    if (formdata.concerns.length > 2) {
+    if (formdata.concerns.length >= 2) {
       //  const list = formdata.concerns.join(', ');
       challenges.push({
         icon: '⚠️',
