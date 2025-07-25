@@ -1,6 +1,7 @@
 
 import React from 'react';
 import type { FormType } from "../Form/Form";
+import type { ReactNode } from 'react';
 
 interface ProsAndConsProps {
   formdata: FormType;
@@ -14,14 +15,17 @@ interface Strength {
 interface Challenge {
   icon: string;
   title: string;
-  description: string;
+  // description: string;
+   description: ReactNode;
 }
 
 export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
+
+
   const getStrengths = (): Strength[] => {
     const strengths: Strength[] = [];
 
-    // Budget strength
+ 
     if (formdata.budget === 'High' || formdata.budget === 'Medium') {
       strengths.push({
         category: 'Budget Allocation',
@@ -115,11 +119,24 @@ export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
     }
 
     
-    if (formdata.concerns.length >= 2) {
+    if (formdata.concerns.length > 2) {
+      //  const list = formdata.concerns.join(', ');
       challenges.push({
         icon: '⚠️',
         title: 'Multiple Security Concerns',
-        description: `Your institution has identified ${formdata.concerns.length} major security concerns that need to be addressed by any proctoring solution.`,
+        // description: `Your institution has identified ${list} as major security concerns that need to be addressed by any proctoring solution.`,
+     description: (
+        <>
+          Your institution has identified{' '}
+          {formdata.concerns.map((c, i) => (
+            <strong key={c}>
+              {c}
+              {i < formdata.concerns.length - 1 ? ', ' : ''}
+            </strong>
+          ))}{' '}
+          as major security concerns that need to be addressed by any proctoring solution.
+        </>
+      ),
       });
     }
 
