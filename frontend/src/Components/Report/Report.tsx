@@ -286,9 +286,19 @@ const DownloadReport = async () => {
     <section>
       <Score score={score} />
     </section>
-    <section>
+    {/* <section>
       <Details formdata={formdata} />
+    </section> */}
+    <section>
+      <div className="mb-5 sm:mb-6">
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+         Assessment Profile
+        </h3>
+        <div className="w-16 h-1 bg-blue-600" />
+      </div>
+     <Details formdata={formdata}/>
     </section>
+ 
   </div>
 
  
