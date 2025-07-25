@@ -17,16 +17,17 @@ export const Home: React.FC<HomeProps> = ({ formdata, setFormdata }) => {
         <Header />
       </header>
 
-      <main className="flex-grow container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-         
-          <Formcomponent formdata={formdata} setFormdata={setFormdata} />
-        </div>
-      </main>
-
+      
+      <main className="container mx-auto px-4">
      
-       
-          <Footer />
+      <div className="max-w-3xl mx-auto py-6 sm:py-8 lg:py-10">
+        <Formcomponent formdata={formdata} setFormdata={setFormdata} />
+      </div>
+    </main>  
+
+           <div className="mt-auto">
+      <Footer />
+    </div>
         
       
     </div>

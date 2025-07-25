@@ -4,20 +4,20 @@ interface Conclusionprop{
   budget :recom;
  
 }
- type recom ='low' | 'medium' | 'high' |'';
+ type recom ='Low' | 'Medium' | 'High' |'';
  type recom2= 'Lockdown Browser + Periodic Monitoring'|'AI-Agent Proctoring Solution'|'Live Proctoring'
 
 interface Typeinterface {
-low :recom2,
-medium:recom2,
- high:recom2
+Low :recom2,
+Medium:recom2,
+ High:recom2
 
 }
   
  const test:Typeinterface  ={
-    low:'Lockdown Browser + Periodic Monitoring',
-     medium:'AI-Agent Proctoring Solution',
-     high:'Live Proctoring'
+    Low:'Lockdown Browser + Periodic Monitoring',
+     Medium:'AI-Agent Proctoring Solution',
+     High:'Live Proctoring'
  }
 
 
@@ -37,7 +37,7 @@ export const Conclusion =({score,budget}:Conclusionprop)=>{
   };
 
   let recommendation = '';
-  if (budget === 'low' || budget === 'medium' || budget === 'high') {
+  if (budget === 'Low' || budget === 'Medium' || budget === 'High') {
     recommendation = test[budget];
   }
 

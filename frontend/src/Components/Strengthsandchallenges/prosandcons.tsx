@@ -22,22 +22,22 @@ export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
     const strengths: Strength[] = [];
 
     // Budget strength
-    if (formdata.budget === 'high' || formdata.budget === 'medium') {
+    if (formdata.budget === 'High' || formdata.budget === 'Medium') {
       strengths.push({
         category: 'Budget Allocation',
         description:
-          formdata.budget === 'high'
+          formdata.budget === 'High'
             ? 'The high budget range provides access to premium proctoring solutions with advanced features.'
             : 'The medium budget range allows for several viable proctoring options with good feature sets.',
       });
     }
 
     // Technical infrastructure
-    if (formdata.techRequirements === 'standard' || formdata.techRequirements === 'advanced') {
+    if (formdata.techRequirements === 'Standard' || formdata.techRequirements === 'Advanced') {
       strengths.push({
         category: 'Technical Infrastructure',
         description:
-          formdata.techRequirements === 'advanced'
+          formdata.techRequirements === 'Advanced'
             ? 'Your institution has advanced technical capabilities that can support sophisticated proctoring solutions.'
             : 'Your institution has standard technical capabilities that can support most proctoring solutions.',
       });
@@ -80,7 +80,7 @@ export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
     }
 
     // Exam schedule
-    if (formdata.examFrequency === 'termly' || formdata.examFrequency === 'yearly') {
+    if (formdata.examFrequency === 'Termly' || formdata.examFrequency === 'Yearly') {
       strengths.push({
         category: 'Exam Schedule',
         description:
@@ -95,7 +95,7 @@ export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
     const challenges: Challenge[] = [];
 
     // Budget constraints
-    if (formdata.budget === 'low') {
+    if (formdata.budget === 'Low') {
       challenges.push({
         icon: '⚠️',
         title: 'Budget Constraints',
@@ -105,7 +105,7 @@ export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
     }
 
     // Technical limitations
-    if (formdata.techRequirements === 'minimal') {
+    if (formdata.techRequirements === 'Minimal') {
       challenges.push({
         icon: '⚠️',
         title: 'Technical Limitations',
@@ -141,7 +141,7 @@ export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
     }
 
     
-    if (formdata.examFrequency === 'daily' || formdata.examFrequency === 'weekly') {
+    if (formdata.examFrequency === 'Daily' || formdata.examFrequency === 'Weekly') {
       challenges.push({
         icon: '⚠️',
         title: 'High Exam Frequency',
@@ -160,7 +160,7 @@ export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {strengths.length > 0 && (
         <div className="mb-8">
-          <h3 className="text-2xl font-semibold text-blue-700 mb-4 border-b-2 border-blue-200 pb-2">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-200 pb-2">
             Key Strengths
           </h3>
           <ul className="space-y-3">
@@ -168,10 +168,10 @@ export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
               <li key={idx} className="flex items-start space-x-3">
                 <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2" />
                 <div>
-                  <strong className="text-blue-800">
+                  <strong className=" font-semibold text-gray-700">
                     {strength.category}:
                   </strong>
-                  <span className="text-gray-700 ml-2">
+                  <span className="text-gray-600 ml-2">
                     {strength.description}
                   </span>
                 </div>
@@ -183,7 +183,7 @@ export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
 
       {challenges.length > 0 && (
         <div className="mb-8">
-          <h3 className="text-2xl font-semibold text-blue-700 mb-4 border-b-2 border-blue-200 pb-2">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4 border-b-2 border-blue-200 pb-2">
             Identified Challenges
           </h3>
           <div className="space-y-4">
@@ -196,10 +196,10 @@ export const Prosandcons: React.FC<ProsAndConsProps> = ({ formdata }) => {
                   {challenge.icon}
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-lg font-semibold text-blue-800 mb-2">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-2">
                     {challenge.title}
                   </h4>
-                  <p className="text-gray-700 leading-relaxed">
+                  <p className="text-gray-600 leading-relaxed">
                     {challenge.description}
                   </p>
                 </div>
