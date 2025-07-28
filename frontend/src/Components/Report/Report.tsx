@@ -1,5 +1,5 @@
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState} from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Header } from '../Header/Header';
 import { Footer } from '../Footer/Footer';
