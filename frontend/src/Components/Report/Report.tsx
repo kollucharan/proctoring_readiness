@@ -11,7 +11,9 @@ import { Implementation } from '../Implementations/Implementations';
 import { Conclusion } from '../Conclusion/Conclusion';
 import type { FormType } from '../Form/Form';
 import SimpleScore from '../Score/Simplescore';
-
+ import { jsPDF } from "jspdf";
+import { toPng } from 'html-to-image';
+import toast from 'react-hot-toast';
 interface ReportProps {
   formdata: FormType;
 }
@@ -33,83 +35,81 @@ export const Report: React.FC<ReportProps> = ({ formdata }) => {
     }
   }, [score, formdata, navigate]);
 
-  // const DownloadReport = async () => {
-  //   if (!reportRef.current) return;
-  //   setIsGenerating(true);
-
-  //   try {
-  //     const htmlToImage = await import('html-to-image');
-  //     const { toPng } = htmlToImage;
-  //     const { jsPDF } = await import('jspdf');
-
-  //     const dataUrl = await toPng(reportRef.current, { cacheBust: true });
-  //     const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
-  //     const imgProps = pdf.getImageProperties(dataUrl);
-  //     const pdfWidth = pdf.internal.pageSize.getWidth();
-  //     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-  //     const pageHeight = pdf.internal.pageSize.getHeight();
-
-  //     let heightLeft = pdfHeight;
-  //     let position = 0;
-
-  //     // Add first page
-  //     pdf.addImage(dataUrl, 'PNG', 0, position, pdfWidth, pdfHeight);
-  //     heightLeft -= pageHeight;
-
-  //     // Add additional pages if needed
-  //     while (heightLeft > 0) {
-  //       position -= pageHeight;
-  //       pdf.addPage();
-  //       pdf.addImage(dataUrl, 'PNG', 0, position, pdfWidth, pdfHeight);
-  //       heightLeft -= pageHeight;
-  //     }
-
-  //     pdf.save('Talviews_Proctoring_Readiness_Report.pdf');
-  //   } catch (error) {
-  //     console.error('Error generating PDF:', error);
-  //   } finally {
-  //     setIsGenerating(false);
-  //   }
-  // };
- 
-  // --- in your DownloadReport handler ---
 const DownloadReport = async () => {
   if (!reportRef.current) return;
   setIsGenerating(true);
 
   try {
-    const { toPng } = await import('html-to-image');
-    const { jsPDF } = await import('jspdf');
+    const wrapper = reportRef.current;
+    const pageGroups = Array.from(wrapper.querySelectorAll<HTMLElement>(".page-group"));
+    if (!pageGroups.length) throw new Error("No .page-group elements found"); 
+    const offscreen = document.createElement("div");
+    offscreen.style.position = "fixed";
+    offscreen.style.top = "-9999px";
+    offscreen.style.left = "-9999px";
+    document.body.appendChild(offscreen);
+    const pdf = new jsPDF({ unit: "px", format: "a4", orientation: "portrait" });
+    const pageWidth  = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin     = 20;
 
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const margin = 20;
+   
+    for (let i = 0; i < pageGroups.length; i++) {
+      const node = pageGroups[i];
 
-    // Grab each page-group container
-    const pages = Array.from(
-      reportRef.current.querySelectorAll<HTMLElement>('.page-group')
-    );
+      
+      const clone = node.cloneNode(true) as HTMLElement;
+      
+      clone.style.maxWidth = "none";
+      clone.style.width    = "1152px";
+      offscreen.appendChild(clone);
 
-    for (let i = 0; i < pages.length; i++) {
-      const node = pages[i];
-      const dataUrl = await toPng(node, { cacheBust: true });
-      const imgProps = pdf.getImageProperties(dataUrl);
+     
+      const width  = Math.ceil(clone.scrollWidth);
+      const height = Math.ceil(clone.scrollHeight);
+      const pixRat = Math.min(window.devicePixelRatio || 1, 2);
 
-      const imgWidth = pageWidth - margin * 2;
-      const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+    
+      const dataUrl = await toPng(clone, {
+        cacheBust: true,
+        pixelRatio: pixRat,
+        canvasWidth:  width,
+        canvasHeight: height,
+        style: {
+          transform:       "scale(1)",
+          transformOrigin: "top left",
+          width:           `${width}px`,
+          height:          `${height}px`,
+        },
+      });
+
+   
+      offscreen.removeChild(clone);
+
+      
+      const scale = (pageWidth - margin * 2) / width;
+      const imgW  = width  * scale;
+      const imgH  = height * scale;
 
       if (i > 0) pdf.addPage();
-      pdf.addImage(dataUrl, 'PNG', margin, margin, imgWidth, imgHeight);
+      pdf.addImage(dataUrl, "PNG", margin, margin, imgW, imgH);
     }
 
-    pdf.save('Talviews_Proctoring_Readiness_Report.pdf');
-  } catch (error) {
-    console.error('Error generating PDF:', error);
+    
+    document.body.removeChild(offscreen);
+
+    
+    pdf.save("Talview_Proctoring_Readiness_Report.pdf");
+  } catch (err) {
+    console.error("PDF generation failed:", err);
+    toast.error('PDF generation failed:', {
+        id: 'Pdf-error',
+      });
   } finally {
     setIsGenerating(false);
   }
 };
-
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -223,54 +223,6 @@ const DownloadReport = async () => {
           
         </div>
       ) : (
-       
-        // <div ref={reportRef} className="max-w-6xl mx-auto bg-white rounded-lg shadow-md px-4 sm:px-6 lg:px-8 py-8 sm:py-10 my-6">
-        //   <div className="text-center mb-10 sm:mb-12">
-        //     <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Proctoring Readiness Report</h1>
-        //     <div className="w-20 sm:w-24 h-1 bg-blue-600 mx-auto mb-5 sm:mb-6" />
-        //     <h2 className="text-xl sm:text-2xl font-semibold text-gray-700 mb-4">Executive Summary</h2>
-        //   </div>
-
-        //   <div className="space-y-12 sm:space-y-16">
-        //     <section><Score score={score} /></section>
-        //     <section><Details formdata={formdata} /></section>
-        //     <section>
-        //       <div className="mb-5 sm:mb-6">
-        //         <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Strengths &amp; Challenges</h3>
-        //         <div className="w-16 h-1 bg-blue-600" />
-        //       </div>
-        //       <Prosandcons formdata={formdata} />
-        //     </section>
-        //     <section>
-        //       <div className="mb-5 sm:mb-6">
-        //         <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Recommendations</h3>
-        //         <div className="w-16 h-1 bg-blue-600" />
-        //       </div>
-        //       <Recommendations formdata={formdata} />
-        //     </section>
-        //     <section>
-        //       <div className="mb-5 sm:mb-6">
-        //         <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Roadmap</h3>
-        //         <div className="w-16 h-1 bg-blue-600" />
-        //       </div>
-        //       <Implementation />
-        //     </section>
-        //     <section>
-        //       <div className="mb-5 sm:mb-6">
-        //         <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Conclusion</h3>
-        //         <div className="w-16 h-1 bg-blue-600" />
-        //       </div>
-        //       <Conclusion score={score} budget={formdata.budget} />
-        //     </section>
-        //   </div>
-        // </div>
-
-
-
-
-
-        
-    
 <div ref={reportRef} className="max-w-6xl mx-auto bg-white rounded-lg shadow-md px-4 sm:px-6 lg:px-8 py-8 sm:py-10 my-6">
  
   <div className="page-group" id="page-1">
@@ -286,9 +238,6 @@ const DownloadReport = async () => {
     <section>
       <Score score={score} />
     </section>
-    {/* <section>
-      <Details formdata={formdata} />
-    </section> */}
     <section>
       <div className="mb-5 sm:mb-6">
         <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
