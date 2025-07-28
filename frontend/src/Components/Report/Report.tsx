@@ -11,8 +11,7 @@ import { Implementation } from '../Implementations/Implementations';
 import { Conclusion } from '../Conclusion/Conclusion';
 import type { FormType } from '../Form/Form';
 import SimpleScore from '../Score/Simplescore';
- import { jsPDF } from "jspdf";
-import { toPng } from 'html-to-image';
+import html2pdf from 'html2pdf.js';
 import toast from 'react-hot-toast';
 interface ReportProps {
   formdata: FormType;
@@ -28,87 +27,43 @@ export const Report: React.FC<ReportProps> = ({ formdata }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showFullReport, setShowFullReport] = useState(false);
 
-  useEffect(() => {
-    
-    if (!score || !formdata || Object.keys(formdata).length === 0) {
-      navigate('/', { replace: true });
-    }
-  }, [score, formdata, navigate]);
+ 
 
-const DownloadReport = async () => {
-  if (!reportRef.current) return;
-  setIsGenerating(true);
+  const DownloadReport = () => {
+    if (!reportRef.current) return;
+    setIsGenerating(true);
 
-  try {
-    const wrapper = reportRef.current;
-    const pageGroups = Array.from(wrapper.querySelectorAll<HTMLElement>(".page-group"));
-    if (!pageGroups.length) throw new Error("No .page-group elements found"); 
-    const offscreen = document.createElement("div");
-    offscreen.style.position = "fixed";
-    offscreen.style.top = "-9999px";
-    offscreen.style.left = "-9999px";
-    document.body.appendChild(offscreen);
-    const pdf = new jsPDF({ unit: "px", format: "a4", orientation: "portrait" });
-    const pageWidth  = pdf.internal.pageSize.getWidth();
-    const margin     = 20;
+    const opt = {
+      margin: [0.5, 0.5, 0.5, 0.5],
+      filename: 'Talview_Proctoring_Readiness_Report.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        scrollY: 0,
+      },
+      jsPDF: {
+        unit: 'in',
+        format: 'a4',
+        orientation: 'portrait',
+      },
+      pagebreak: {
+        mode: ['avoid-all', 'css', 'legacy'],
+      },
+    };
 
-   
-    for (let i = 0; i < pageGroups.length; i++) {
-      const node = pageGroups[i];
-
-      
-      const clone = node.cloneNode(true) as HTMLElement;
-      
-      clone.style.maxWidth = "none";
-      clone.style.width    = "1152px";
-      offscreen.appendChild(clone);
-
-     
-      const width  = Math.ceil(clone.scrollWidth);
-      const height = Math.ceil(clone.scrollHeight);
-      const pixRat = Math.min(window.devicePixelRatio || 1, 2);
-
-    
-      const dataUrl = await toPng(clone, {
-        cacheBust: true,
-        pixelRatio: pixRat,
-        canvasWidth:  width,
-        canvasHeight: height,
-        style: {
-          transform:       "scale(1)",
-          transformOrigin: "top left",
-          width:           `${width}px`,
-          height:          `${height}px`,
-        },
+    html2pdf()
+      .set(opt)
+      .from(reportRef.current)
+      .save()
+      .then(() => setIsGenerating(false))
+      .catch((err: any) => {
+        console.error('PDF generation failed:', err);
+        toast.error('PDF generation failed.', { id: 'Pdf-error' });
+        setIsGenerating(false);
       });
-
-   
-      offscreen.removeChild(clone);
-
-      
-      const scale = (pageWidth - margin * 2) / width;
-      const imgW  = width  * scale;
-      const imgH  = height * scale;
-
-      if (i > 0) pdf.addPage();
-      pdf.addImage(dataUrl, "PNG", margin, margin, imgW, imgH);
-    }
-
-    
-    document.body.removeChild(offscreen);
-
-    
-    pdf.save("Talview_Proctoring_Readiness_Report.pdf");
-  } catch (err) {
-    console.error("PDF generation failed:", err);
-    toast.error('PDF generation failed:', {
-        id: 'Pdf-error',
-      });
-  } finally {
-    setIsGenerating(false);
-  }
-};
-  
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -221,83 +176,55 @@ const DownloadReport = async () => {
           </section>
           
         </div>
-      ) : (
-<div ref={reportRef} className="max-w-6xl mx-auto bg-white rounded-lg shadow-md px-4 sm:px-6 lg:px-8 py-8 sm:py-10 my-6">
- 
-  <div className="page-group" id="page-1">
-    <div className="report-header text-center mb-10 sm:mb-12">
-      <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
-        Proctoring Readiness Report
-      </h1>
-      <div className="w-20 sm:w-24 h-1 bg-blue-600 mx-auto mb-5 sm:mb-6" />
-      <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">
-        Executive Summary
-      </h2>
-    </div>
-    <section>
-      <Score score={score} />
-    </section>
-    <section>
-      <div className="mb-5 sm:mb-6">
-        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-         Assessment Profile
-        </h3>
-        <div className="w-16 h-1 bg-blue-600" />
-      </div>
-     <Details formdata={formdata}/>
-    </section>
- 
-  </div>
+      )  :  (
+        <div ref={reportRef} className="w-full bg-white px-4 sm:px-6 lg:px-8 py-6 space-y-16">
 
- 
-  <div className="page-group" id="page-2">
-    <section>
-      <div className="mb-5 sm:mb-6">
-        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-          Strengths &amp; Challenges
-        </h3>
-        <div className="w-16 h-1 bg-blue-600" />
-      </div>
-      <Prosandcons formdata={formdata} />
-    </section>
-  </div>
+        
+          <div className="page-group">
+            <div className="text-center mb-10">
+              <h1 className="text-3xl font-bold text-gray-900 mb-3">Proctoring Readiness Report</h1>
+              <div className="w-20 h-1 bg-blue-600 mx-auto mb-5" />
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Executive Summary</h2>
+            </div>
+            <Score score={score} />
+          </div>
 
-  
-  <div className="page-group" id="page-3">
-    <section>
-      <div className="mb-5 sm:mb-6">
-        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-          Recommendations
-        </h3>
-        <div className="w-16 h-1 bg-blue-600" />
-      </div>
-      <Recommendations formdata={formdata} />
-    </section>
-  </div>
+         
+          <div className="page-group">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Assessment Profile</h3>
+            <div className="w-16 h-1 bg-blue-600 mb-6" />
+            <Details formdata={formdata} />
+          </div>
 
- 
-  <div className="page-group" id="page-4">
-    <section>
-      <div className="mb-5 sm:mb-6">
-        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-          Roadmap
-        </h3>
-        <div className="w-16 h-1 bg-blue-600" />
-      </div>
-      <Implementation />
-    </section>
-    <section className="mt-12">
-      <div className="mb-5 sm:mb-6">
-        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-          Conclusion
-        </h3>
-        <div className="w-16 h-1 bg-blue-600" />
-      </div>
-      <Conclusion score={score} budget={formdata.budget} />
-    </section>
-  </div>
-</div>
+       
+          <div className="page-group">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Strengths &amp; Challenges</h3>
+            <div className="w-16 h-1 bg-blue-600 mb-6" />
+            <Prosandcons formdata={formdata} />
+          </div>
 
+        
+          <div className="page-group">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Recommendations</h3>
+            <div className="w-16 h-1 bg-blue-600 mb-6" />
+            <Recommendations formdata={formdata} />
+          </div>
+
+       
+          <div className="page-group" style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Roadmap</h3>
+            <div className="w-16 h-1 bg-blue-600 mb-6" />
+            <Implementation />
+          </div>
+
+          
+          <div className="page-group">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Conclusion</h3>
+            <div className="w-16 h-1 bg-blue-600 mb-6" />
+            <Conclusion score={score} budget={formdata.budget} />
+          </div>
+
+        </div>
       )}
 
       <Footer />
@@ -305,6 +232,6 @@ const DownloadReport = async () => {
   );
 };
 
-
-
 export default Report;
+
+ 
