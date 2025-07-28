@@ -50,7 +50,6 @@ const DownloadReport = async () => {
     document.body.appendChild(offscreen);
     const pdf = new jsPDF({ unit: "px", format: "a4", orientation: "portrait" });
     const pageWidth  = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
     const margin     = 20;
 
    
