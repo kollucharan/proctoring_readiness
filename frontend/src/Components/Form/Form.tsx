@@ -46,6 +46,8 @@ export const Formcomponent = ({ formdata, setFormdata }: FormProps) => {
         { value: 'Higher Education', label: 'Higher Education' },
         { value: 'K12-school', label: 'K12 School' },
         { value: 'Corporate Training', label: 'Corporate Training' },
+         { value: 'Certification Agencies', label: 'Certification Agencies' },
+
         { value: 'Other', label: 'Other' }
       ]
     },
